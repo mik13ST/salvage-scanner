@@ -12,3 +12,6 @@ This device is for testing components:
 
 For generating PWM signals 100Hz..25kHz (uses timer1)
 For measuring frequency up to 4 kHz (uses timer1/comparator)
+
+## Editor
+Tapia Favio

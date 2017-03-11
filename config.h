@@ -7,7 +7,8 @@
 
 // Choose which setup, only one is allowed
 //#define LCD_PRINT                              //Print on LCD with I2C interface
-#define LCD_DOGM128                              //use LCD DOGM128
+//#define LCD_DOGM128                            //use LCD DOGM128
+#define LCD_PCD8544                              //Use LCD PCD8544, Nokia 5110/3110
 //#define DEBUG_PRINT                            //Print on Serial Port
 
 #define DET_COMP_ANALYSIS                        //Detailed Component Analysis (Soon)
@@ -21,14 +22,14 @@
  #define USER_WAIT            1000               //Nexpage Timeout
 #endif
 //Test probes - Must be an ADC port :-)
-#define ADC_PORT              PORTC              //ADC port data register 
-#define ADC_DDR               DDRC               //ADC port data direction register 
-#define ADC_PIN               PINC               //Port input pins register 
-#define TP1                   0                  //Test pin 1 (=0) 
-#define TP2                   1                  //Test pin 2 (=1) 
-#define TP3                   2                  //Test pin 3 (=2) 
+#define ADC_PORT              PORTC              //ADC port data register
+#define ADC_DDR               DDRC               //ADC port data direction register
+#define ADC_PIN               PINC               //Port input pins register
+#define TP1                   0                  //Test pin 1 (=0)
+#define TP2                   1                  //Test pin 2 (=1)
+#define TP3                   2                  //Test pin 3 (=2)
 /*
-   Probe resistors: 
+   Probe resistors:
    The resistors must be connected to the lower 6 pins of the port in
    following sequence:
     - pin 0: Rl1 680R (test pin 1)
@@ -39,9 +40,15 @@
     - pin 5: Rh3 470k (test pin 3)
     Except when connected to PortD we shift 2 bits higher
 */
-#define R_PORT                PORTD              //Port data register 
-#define R_DDR                 DDRD               //Port data direction register
-#define R_SHIFT               2                  //Additional Shift positions for PORTB it should be 0, for PORT D it should be 2
+#ifdef LCD_PCD8544
+  #define R_PORT                PORTB              //Port data register
+  #define R_DDR                 DDRB               //Port data direction register
+  #define R_SHIFT               0                  //Additional Shift positions for PORTB it should be 0, for PORT D it should be 2
+#else
+  #define R_PORT                PORTD              //Port data register
+  #define R_DDR                 DDRD               //Port data direction register
+  #define R_SHIFT               2                  //Additional Shift positions for PORTB it should be 0, for PORT D it should be 2
+#endif
 
 //Push button
 #define TEST_BUTTON           A3                 //Test/start push button (low active)
@@ -52,7 +59,7 @@
 
 //Maximum number of measurements without any components found.
 #define CYCLE_MAX             5
-//ADC voltage reference based on Vcc (in mV). 
+//ADC voltage reference based on Vcc (in mV).
 #define UREF_VCC              5001
 /*
   Offset for the internal bandgap voltage reference (in mV): -100 up to 100
@@ -72,20 +79,20 @@
 //Rh in Ohms
 #define R_HIGH                470000
 //Offset for systematic error of resistor measurement with Rh (470k) in Ohms.
-#define RH_OFFSET             700 
+#define RH_OFFSET             700
 /*
    Resistance of probe leads (in 0.01 Ohms).
     - Resistance of two probe leads in series.
     - Assuming all probe leads got same/similar resistance.
 */
 #define R_ZERO                20
-/* 
+/*
    Capacitance of the wires between PCB and terminals (in pF).
    Examples:
     - 2pF for wires 10cm long
 */
 #define CAP_WIRES             15
-/* 
+/*
    Capacitance of the probe leads connected to the tester (in pF).
    Examples:
      capacity  length of probe leads
@@ -132,24 +139,27 @@
 #define COMP_THYRISTOR        25
 
 //Chars
-#define LCD_CHAR_UNSET        0                  //Just a place holder 
-#define LCD_CHAR_DIODE1       1                  //Diode icon '>|' 
-#define LCD_CHAR_DIODE2       2                  //Diode icon '|<' 
-#define LCD_CHAR_CAP          3                  //Capacitor icon '||' 
+#define LCD_CHAR_UNSET        0                  //Just a place holder
+#define LCD_CHAR_DIODE1       1                  //Diode icon '>|'
+#define LCD_CHAR_DIODE2       2                  //Diode icon '|<'
+#define LCD_CHAR_CAP          3                  //Capacitor icon '||'
 #define LCD_CHAR_FLAG         4                  //Flag Icon
-#define LCD_CHAR_RESIS1       6                  //Resistor left icon '[' 
+#define LCD_CHAR_RESIS1       6                  //Resistor left icon '['
 #define LCD_CHAR_RESIS2       7                  //Resistor right icon ']'
 #ifdef DEBUG_PRINT
-  #define LCD_CHAR_OMEGA      79              
+  #define LCD_CHAR_OMEGA      79
   #define LCD_CHAR_MICRO      '\u00B5'           //Code for Arduino Serial Monitor
 #else
  #ifdef LCD_PRINT
-  #define LCD_CHAR_OMEGA      244                //Default: 244 
+  #define LCD_CHAR_OMEGA      244                //Default: 244
   #define LCD_CHAR_MICRO      228
- #else
+ #elif LCD_DOGM128
   //LCD_DOGM128
   #define LCD_CHAR_OMEGA      248                // omega
   #define LCD_CHAR_MICRO      117                // u
+ #else
+  #define LCD_CHAR_OMEGA      'R'                // omega 'Ω'
+  #define LCD_CHAR_MICRO      'µ'                // micro
  #endif
 #endif
 
@@ -157,26 +167,26 @@
 #define TYPE_DISCHARGE        1                  //Discharge error
 
 //FET type bit masks (also used for IGBTs)
-#define TYPE_N_CHANNEL        0b00000001         //n channel 
-#define TYPE_P_CHANNEL        0b00000010         //p channel 
-#define TYPE_ENHANCEMENT      0b00000100         //Enhancement mode 
-#define TYPE_DEPLETION        0b00001000         //Depletion mode 
-#define TYPE_MOSFET           0b00010000         //MOSFET 
-#define TYPE_JFET             0b00100000         //JFET 
-#define TYPE_IGBT             0b01000000         //IGBT (no FET) 
+#define TYPE_N_CHANNEL        0b00000001         //n channel
+#define TYPE_P_CHANNEL        0b00000010         //p channel
+#define TYPE_ENHANCEMENT      0b00000100         //Enhancement mode
+#define TYPE_DEPLETION        0b00001000         //Depletion mode
+#define TYPE_MOSFET           0b00010000         //MOSFET
+#define TYPE_JFET             0b00100000         //JFET
+#define TYPE_IGBT             0b01000000         //IGBT (no FET)
 
 //Mode bitmask
-#define MODE_LOW_CURRENT      0b00000001         //Low test current 
-#define MODE_HIGH_CURRENT     0b00000010         //High test current 
+#define MODE_LOW_CURRENT      0b00000001         //Low test current
+#define MODE_HIGH_CURRENT     0b00000010         //High test current
 #define MODE_DELAYED_START    0b00000100         //Delayed start
 
-//BJT (bipolar junction transistor) type IDs 
+//BJT (bipolar junction transistor) type IDs
 #define TYPE_NPN              1                  //NPN
 #define TYPE_PNP              2                  //PNP
 
 //Tester operation modes
 #define MODE_CONTINOUS        0                  //Continous
-#define MODE_AUTOHOLD         1                  //Auto hold 
+#define MODE_AUTOHOLD         1                  //Auto hold
 
 //Multiplicator tables
 #define TABLE_SMALL_CAP       1
@@ -198,7 +208,7 @@
 #define COMPONENT_INDUCTOR         5
 #define COMPONENT_DIODE            6
 #define COMPONENT_NPN              7
-#define COMPONENT_PNP              8 
+#define COMPONENT_PNP              8
 #define COMPONENT_NFET             9
 #define COMPONENT_PFET             10
 #define COMPONENT_NIGBT            11
