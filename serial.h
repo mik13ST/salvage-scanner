@@ -32,6 +32,7 @@
 	void begin(uint8_t cols, uint8_t rows);
 	void setCursor(uint8_t col, uint8_t row);
 	void backlight(void);
+	void update(void);
 	void createChar(uint8_t location, uint8_t charmap[]);
 	#ifdef __AVR__
 	void createChar(uint8_t location, const char *charmap);

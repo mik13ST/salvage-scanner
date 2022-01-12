@@ -68,6 +68,11 @@
 		Serial.println();
 	}
 	void SerialDisplay::backlight(void){}
+
+	void SerialDisplay::update(void){
+		Serial.println();
+	}
+
 	void SerialDisplay::createChar(uint8_t location, uint8_t charmap[]){}
 	#ifdef __AVR__
 	void SerialDisplay::createChar(uint8_t location, const char *charmap){}
