@@ -50,6 +50,7 @@
 			this->lcd_data(*String);                           //Send character
 			String++;                                    //Next one
 		}
+		this->update();
 	}
 
 	//Display a fixed string stored in PROGMEM
@@ -369,6 +370,7 @@
     }
     _column = 0;
     _row = 0;
+		this->update();
 	}
 	void GraphicDisplay::lcd_line(unsigned char Line) {
 		_column = 0;
@@ -382,18 +384,21 @@
     for( int i = _row*LENGTHCHARS; i < _row*LENGTHCHARS+LENGTHCHARS; i++) {
       _symbuffer[i] = ' ';
     }
+		this->update();
 	}
 	//Write probe pin number to the LCD
 	void GraphicDisplay::lcd_testpin(unsigned char Probe)
 	{
 		//Since TP1 is 0 we simply add the value to '1'
 		this->lcd_data('1' + Probe);                   //Send data
+		this->update();
 	}
 
 	//Display a space
 	void GraphicDisplay::lcd_space(void)
 	{
 		this->lcd_data(' ');
+		this->update();
 	}
 
 	//Display a string
@@ -404,6 +409,7 @@
 			this->lcd_data(*String);                           //Send character
 			String++;                                    //Next one
 		}
+		this->update();
 	}
 
 	//Display a fixed string stored in PROGMEM
@@ -411,6 +417,7 @@
 	{
 		while (pgm_read_byte(String) != 0x00)
 			this->lcd_data(pgm_read_byte(String++));           //Send character
+		this->update();
 	}
 	void GraphicDisplay::print(const char *Str)
 	{
@@ -418,6 +425,7 @@
       _symbuffer[i] = (byte)*Str++;
       _column++;
     }
+		this->update();
 	}
 	void GraphicDisplay::begin(uint8_t cols, uint8_t rows)
 	{
@@ -698,6 +706,7 @@
     else
       this->lcd_data(' ');
     this->setCursor( co, r);
+		this->update();
   }
 #endif // defined(LCD_PCD8544)
 

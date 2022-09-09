@@ -704,6 +704,7 @@ void loop()
           lcd.lcd_data(':');
           lcd.lcd_space();
           DisplayValue(Check.U, -3, 'V');
+					lcd.update();
         }
         else                                     //Skip all other checks
         {
@@ -729,17 +730,21 @@ void loop()
               lcd.lcd_clear_line(1);
               lcd.lcd_fixed_string(Running_str);
               lcd.lcd_data('.');
+							lcd.update();
             #endif
             //Check all possible combinations
             MeasureCap(TP3, TP1, 0);
+						lcd.update();
             #ifdef LCD_PRINT
               lcd.lcd_data('.');
             #endif
             MeasureCap(TP3, TP2, 1);
+						lcd.update();
             #ifdef LCD_PRINT
               lcd.lcd_data('.');
             #endif
             MeasureCap(TP2, TP1, 2);
+						lcd.update();
           }
           //Clear LCD
           lcd.lcd_clear();
@@ -2920,6 +2925,7 @@ void MeasureCap(byte Probe1, byte Probe2, byte ID)
       Check.Found = COMP_CAPACITOR;              //Report capacitor
     }
   }
+	lcd.update();
   //Clean up
   DischargeProbes();                             //Discharge DUT
   //Reset all ports and pins
@@ -3218,6 +3224,7 @@ void DisplayValue(unsigned long Value, signed char Exponent, unsigned char Unit)
   //Display prefix and unit
   if (Prefix) lcd.lcd_data(Prefix);
   if (Unit) lcd.lcd_data(Unit);
+	lcd.update();
 }
 
 //Display signed value and unit
@@ -3271,6 +3278,7 @@ void ShortCircuit(byte Mode)
     {
       if (Test == 3) Run = 0;                    //End loop if all shorted
     }
+		lcd.update();
     if (Run == 1)                                //If not done yet
       delay(50);                                 //Wait a little bit
     else                                         //If done
@@ -3405,6 +3413,7 @@ void ShowFail(void)
     lcd.lcd_data(Check.Diodes + '0');                //Display number of diodes found
     lcd.lcd_fixed_string(Diode_AC_str);              //Display: -|>|-
   }
+	lcd.update();
   RunsMissed++;                                  //Increase counter
   RunsPassed = 0;                                //Reset counter
 }
@@ -3559,6 +3568,7 @@ void ShowDiode(void)
       lcd.lcd_data('(');
       DisplayValue(D1->V_f2, 0, 0);
       lcd.lcd_data(')');
+			lcd.update();
     }
     //Reverse leakage current
     UpdateProbes(D1->C, D1->A, 0);               //Reverse diode
@@ -3757,6 +3767,7 @@ void Show_FET_IGBT_Extras(byte Symbol)
   {
     lcd.lcd_space();                                 //Display space
     lcd.lcd_data(Symbol);                            //Display diode symbol
+		lcd.update();
   }
   #ifdef BUTTON_INST
     TestKey(USER_WAIT, 11);                      //Next page
@@ -4073,6 +4084,7 @@ byte SelfTest(void)
       lcd.lcd_data('T');                             //Display: T
       lcd.lcd_data('0' + Test);                      //Display test number
       lcd.lcd_space();
+			lcd.update();
       DisplayFlag = 1;                           //Display values by default
       //Tests
       switch (Test)
@@ -4166,9 +4178,11 @@ byte SelfTest(void)
             lcd.lcd_clear_line(1);
             lcd.lcd_string(comp[i-3]);
             lcd.component(i);
+						lcd.update();
             delay(1000);
           }
           lcd.component(0);
+					lcd.update();
           Counter = 5; // Only 1 time this test will repeat
           break;
           #endif
@@ -4241,6 +4255,7 @@ byte SelfAdjust(void)
       lcd.lcd_data('A');                             //Display: a
       lcd.lcd_data('0' + Test);                      //Display number
       lcd.lcd_space();
+			lcd.update();
       DisplayFlag = 1;                           //Display values by default
       //Tests
       switch (Test)
@@ -4533,6 +4548,7 @@ void PWM_Tool(unsigned int Frequency)
   lcd.lcd_data(' ');
   DisplayValue(Frequency, 0, 'H');               //Display frequency
   lcd.lcd_data('z');                                 //Make it Hz :-)
+	lcd.update();
 
   //Calculate required prescaler and top value based on MCU clock, depth = f_MCU / (2 * prescaler * f_PWM)
   Value = CPU_FREQ / 2;
@@ -4573,6 +4589,7 @@ void PWM_Tool(unsigned int Frequency)
         lcd.lcd_string("Long  Press -5%");
         lcd.lcd_clear_line(6);
         lcd.lcd_string("Double Press Start");
+				lcd.update();
         #endif
         delay(500);                                  //Smooth UI
         //Short key press -> increase ratio, long key press -> decrease ratio, two short key presses -> exit PWM
@@ -4621,6 +4638,7 @@ void PWM_Tool(unsigned int Frequency)
         lcd.lcd_clear_line(4);
         lcd.lcd_clear_line(5);
         lcd.lcd_clear_line(6);
+				lcd.update();
       #else
        pinMode(10,OUTPUT); // this must be set, when dogm128 pin is already in output mode
       #endif
@@ -4889,6 +4907,7 @@ void StartFreqMeasure(void)
       lcd.lcd_string("Short Press - next");
       lcd.lcd_line(2);
       lcd.lcd_string("Long Press - break");
+			lcd.update();
       Test = TestKey(0,0);
      }
      pinMode(12, OUTPUT); // PB4
@@ -4972,6 +4991,7 @@ byte MenuTool(byte Items, byte Type, void *Menu[], unsigned char *Unit)
   unsigned int                Value;             //Temp. value
   Items--;                                       //To match array counter
   lcd.lcd_data(':');                                 //Whatever:
+	lcd.update();
   while (Run)
   {
     //Display item
@@ -4999,6 +5019,7 @@ byte MenuTool(byte Items, byte Type, void *Menu[], unsigned char *Unit)
     if (Selected < Items) n = 126;               //Another item follows
     else n = 127;                                //Last item
     lcd.lcd_data(n);
+		lcd.update();
     //Process user feedback
     n = TestKey(0, 0);                           //Wait for testkey
     if (n == 1)                                  //Short key press: moves to next item
@@ -5015,6 +5036,7 @@ byte MenuTool(byte Items, byte Type, void *Menu[], unsigned char *Unit)
     }
   }
   lcd.lcd_clear();
+	lcd.update();
   delay(500);                                    //Smooth UI
   return Selected;
 }
